@@ -1,0 +1,21 @@
+{
+  "name": "Sledovanie výdavkov",
+  "short_name": "Výdavky",
+  "start_url": "/cyklus-vydavkov/?source=pwa",
+  "scope": "/cyklus-vydavkov/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAAB...==",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAYAAAD...==",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
