@@ -1141,6 +1141,38 @@ async function handlePrintChartAndTable() {
                 <p style="font-size: 1rem; margin-bottom: 0.25rem;">Zostáva mi: <span class="total">${remaining.toFixed(2)} €</span></p>
             </div>
         </div>
+        <!-- Súhrnná tabuľka pod grafom -->
+<div style="margin-top: 2rem;">
+    <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">
+        Súhrn výdavkov podľa kategórie
+    </h2>
+
+    <table class="print-table" style="min-width: 100%;">
+        <thead>
+            <tr style="background-color: #f3f4f6;">
+                <th style="padding: 12px; color: #4b5563;">Kategória</th>
+                <th style="padding: 12px; color: #4b5563;">Suma (€)</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${Object.entries(categoryTotals)
+                .map(([category, amount]) => `
+                    <tr class="border-b border-gray-200">
+                        <td class="py-3 px-6 text-left whitespace-nowrap">${category}</td>
+                        <td class="py-3 px-6 text-left font-bold" style="color:#1f2937;">
+                            ${amount.toFixed(2)} €
+                        </td>
+                    </tr>
+                `).join('')}
+
+            <tr style="background-color: #e5e7eb; font-weight: bold;">
+                <td class="py-3 px-6 text-left">CELKOM</td>
+                <td class="py-3 px-6 text-left">${totalSpent.toFixed(2)} €</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
     `;
 
     const printWindow = window.open('', '_blank', 'height=600,width=800');
@@ -1287,4 +1319,5 @@ document.getElementById('delete-history-btn').addEventListener('click', handleDe
 </script>
 </body>
 </html>
+
 
