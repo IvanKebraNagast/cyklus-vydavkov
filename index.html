@@ -423,7 +423,7 @@ const archiveKey = `${archiveKeyPrefix}${cycleEndDate.toISOString()}`;
 const dataToArchive = JSON.parse(localStorage.getItem(currentCycleKey));
 if (dataToArchive) {
 const finalData = {
-...dataToArchive,
+dataToArchive,
 cycleStartDate: dataToArchive.cycleStartDate || cycleEndDate.toISOString(),
 cycleEndDate: cycleEndDate.toISOString(),
 };
@@ -1252,6 +1252,7 @@ document.getElementById('delete-history-btn').addEventListener('click', handleDe
 </script>
 </body>
 </html>
+
 
 
 
