@@ -462,9 +462,14 @@ async function handleAddExpense() {
 
   let expenseCategory = document.getElementById('expense-category').value;
 
-  if (expenseCategory === "custom") {
+if (expenseCategory === "custom") {
     expenseCategory = document.getElementById('custom-category').value.trim();
-  }
+    if (!expenseCategory) {
+        showMessage('Zadajte názov vlastnej položky.', 'error');
+        return;
+    }
+}
+
 
 
 
@@ -751,5 +756,6 @@ if ('serviceWorker' in navigator) {
 </script>
 </body>
 </html>
+
 
 
