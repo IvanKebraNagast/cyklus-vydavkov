@@ -1057,16 +1057,107 @@ async function handlePrintChartAndTable() {
 
     const pieChartCanvas = document.getElementById('expense-pie-chart');
     const pieChartImage = pieChartCanvas ? pieChartCanvas.toDataURL('image/png', 1.0) : null;
-    
+
     const budgetChartCanvas = document.getElementById('budget-bar-chart');
     const budgetChartImage = budgetChartCanvas ? budgetChartCanvas.toDataURL('image/png', 1.0) : null;
-    
+
     const dataToPrint = {
         expenses: expenses,
         monthlyIncome: monthlyIncome,
         monthlyBudget: monthlyBudget,
         cycleStartDate: cycleStartDate
     };
+
+    const cycleStartDateString = dataToPrint.cycleStartDate
+        ? new Date(dataToPrint.cycleStartDate).toLocaleDateString('sk-SK')
+        : 'N/A';
+    const cycleEndDateString = new Date().toLocaleDateString('sk-SK');
+
+    const tableRows = dataToPrint.expenses.length > 0
+        ? dataToPrint.expenses.map(item => `
+            <tr class="border-b border-gray-200">
+                <td class="py-3 px-6 text-left whitespace-nowrap">
+                    ${new Date(item.date).toLocaleDateString('sk-SK')} - ${item.category}
+                </td>
+                <td class="py-3 px-6 text-left text-red-600">
+                    -${item.amount.toFixed(2)} €
+                </td>
+            </tr>
+        `).join('')
+        : `<tr><td colspan="2" class="py-3 px-6 text-center text-gray-500">
+            Zatiaľ žiadne dáta pre tento cyklus.
+        </td></tr>`;
+
+    const totalSpent = dataToPrint.expenses.reduce((sum, e) => sum + e.amount, 0);
+    const remaining = dataToPrint.monthlyIncome - totalSpent;
+
+    const categoryTotals = dataToPrint.expenses.reduce((acc, item) => {
+        acc[item.category] = (acc[item.category] || 0) + item.amount;
+        return acc;
+    }, {});
+
+    const printContent = `
+        <style>
+            body { font-family: Inter, sans-serif; margin:0; padding:0; color:#1f2937; }
+            table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+            th, td { border: 1px solid #d1d5db; padding: 0.75rem; }
+            th { background-color: #e5e7eb; font-weight: bold; }
+            .no-print { position:fixed; top:1rem; right:1rem; display:flex; gap:.5rem; }
+            .no-print button {
+                background:#dc2626; color:#fff; padding:.7rem 1.5rem; font-weight:bold;
+                border:none; border-radius:.5rem; cursor:pointer;
+            }
+            .no-print button:hover { background:#991b1b; }
+            @media print { .no-print { display:none; } }
+        </style>
+
+        <div class="no-print">
+            <button onclick="window.close()">Späť</button>
+            <button onclick="window.print()">Tlačiť</button>
+        </div>
+
+        <h1 style="text-align:center">Prehľad rozpočtu</h1>
+        <p style="text-align:center; color:#4b5563">
+            Cyklus od ${cycleStartDateString} do ${cycleEndDateString}
+        </p>
+
+        ${pieChartImage ? `
+            <h2>Graf výdavkov</h2>
+            <img src="${pieChartImage}" style="max-width:100%; height:auto;">
+        ` : ''}
+
+        <h2>Podrobný zoznam výdavkov</h2>
+        <table>
+            <thead><tr><th>Dátum a položka</th><th>Suma (€)</th></tr></thead>
+            <tbody>${tableRows}</tbody>
+        </table>
+
+        ${budgetChartImage ? `
+            <h2 style="margin-top:2rem;">Rozpočtové kategórie</h2>
+            <img src="${budgetChartImage}" style="max-width:100%; height:auto;">
+        ` : ''}
+
+        <h2 style="margin-top:2rem;">Súhrn výdavkov podľa kategórie</h2>
+        <table>
+            <thead><tr><th>Kategória</th><th>Suma (€)</th></tr></thead>
+            <tbody>
+                ${Object.entries(categoryTotals).map(([cat, amount]) => `
+                    <tr><td>${cat}</td><td>${amount.toFixed(2)} €</td></tr>
+                `).join('')}
+                <tr style="font-weight:bold; background:#e5e7eb;">
+                    <td>CELKOM</td>
+                    <td>${totalSpent.toFixed(2)} €</td>
+                </tr>
+            </tbody>
+        </table>
+    `;
+
+    const printWindow = window.open('', '_blank', 'width=900,height=700');
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.focus();
+}
+
 
     const cycleStartDateString = dataToPrint.cycleStartDate ? new Date(dataToPrint.cycleStartDate).toLocaleDateString('sk-SK') : 'N/A';
     const cycleEndDateString = new Date().toLocaleDateString('sk-SK');
@@ -1321,6 +1412,7 @@ document.getElementById('delete-history-btn').addEventListener('click', handleDe
 </script>
 </body>
 </html>
+
 
 
 
