@@ -1153,33 +1153,40 @@ async function handlePrintChartAndTable() {
                 <th style="padding: 12px; color: #4b5563;">Kategória</th>
                 <th style="padding: 12px; color: #4b5563;">Suma (€)</th>
             </tr>
-        </thead>
-        <tbody>
-            ${Object.entries(categoryTotals).map(([category, amount]) => `
-                <tr class="border-b border-gray-200">
-                    <td class="py-3 px-6 text-left whitespace-nowrap">${category}</td>
-                    <td class="py-3 px-6 text-left font-bold" style="color:#1f2937;">
-                        ${amount.toFixed(2)} €
-                    </td>
-                </tr>
-            `).join('')}
+   </thead>
+<tbody>
+    ${Object.entries(categoryTotals).map(([category, amount]) => `
+        <tr class="border-b border-gray-200">
+            <td class="py-3 px-6 text-left whitespace-nowrap">${category}</td>
+            <td class="py-3 px-6 text-left font-bold" style="color:#1f2937;">
+                ${amount.toFixed(2)} €
+            </td>
+        </tr>
+    `).join('')}
 
-            <tr style="background-color: #e5e7eb; font-weight: bold;">
-                <td class="py-3 px-6 text-left">CELKOM</td>
-                <td class="py-3 px-6 text-left">${totalSpent.toFixed(2)} €</td>
-            </tr>
-        </tbody>
-    </table>
+    <tr style="background-color: #e5e7eb; font-weight: bold;">
+        <td class="py-3 px-6 text-left">CELKOM</td>
+        <td class="py-3 px-6 text-left">${totalSpent.toFixed(2)} €</td>
+    </tr>
+</tbody>
+</table>
 </div>
 `;
-
-
+    
 const printWindow = window.open('', '_blank', 'width=900,height=700');
 printWindow.document.write(printContent);
 printWindow.document.close();
 printWindow.focus();
 }  // koniec funkcie handlePrintChartAndTable
+
+function updateCycleDatesDisplay(start = cycleStartDate, end = null) {
+    ...
+}
 </script>
+
+
+</script>
+
 
 
 
@@ -1314,6 +1321,7 @@ document.getElementById('delete-history-btn').addEventListener('click', handleDe
 </script>
 </body>
 </html>
+
 
 
 
