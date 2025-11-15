@@ -1014,6 +1014,12 @@ async function handlePrintChartAndTable() {
     const totalSpent = dataToPrint.expenses.reduce((sum, e) => sum + e.amount, 0);
     const remaining = dataToPrint.monthlyIncome - totalSpent;
 
+    // 🔥 DOPLNENÉ – TOTO JE TO, ČO TI CHÝBALO!
+    const categoryTotals = dataToPrint.expenses.reduce((acc, item) => {
+        acc[item.category] = (acc[item.category] || 0) + item.amount;
+        return acc;
+    }, {});
+
     const printContent = `
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
@@ -1034,158 +1040,83 @@ async function handlePrintChartAndTable() {
             th { background-color: #e5e7eb; color: #4b5563; font-weight: bold; }
             .summary p { font-size: 1.2rem; margin-bottom: 0.5rem; }
             .summary .total { font-weight: bold; }
-            .no-print {
-                display: flex;
-                justify-content: space-between;
-                gap: 0.5rem;
-                position: fixed;
-                top: 1rem;
-                right: 1rem;
-                left: 1rem;
-                z-index: 1000;
-            }
+            .no-print { display: flex; gap: 0.5rem; position: fixed; top: 1rem; right: 1rem; left: 1rem; z-index: 1000; }
             .no-print button {
-                background-color: #dc2626;
-                color: #fff;
-                font-weight: bold;
-                padding: 0.75rem 1.5rem;
-                border-radius: 0.5rem;
-                border: none;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
+                background-color: #dc2626; color: #fff; font-weight: bold;
+                padding: 0.75rem 1.5rem; border-radius: 0.5rem; border: none;
+                cursor: pointer; display: flex; align-items: center; gap: 0.5rem;
             }
-            .no-print button:hover {
-                background-color: #991b1b;
-            }
+            .no-print button:hover { background-color: #991b1b; }
             @media print {
-                .no-print {
-                    display: none;
-                }
-                body {
-                    margin: 0;
-                    padding: 0;
-                }
-                .print-container {
-                    padding: 0.5rem !important;
-                }
-                .print-table {
-                    font-size: 0.7rem !important;
-                }
-                .summary {
-                    margin-top: 0.1rem !important; /* Ešte menšia medzera */
-                    padding-top: 0.1rem !important; /* Ešte menší padding */
-                    border-top: 1px solid #d1d5db;
-                }
-                .summary p {
-                    font-size: 0.7rem !important; /* Zmenšené písmo */
-                    margin-bottom: 0 !important; /* Žiadna medzera medzi riadkami */
-                }
-                /* Nové pravidlo pre minimalizáciu medzery */
-                .print-container .summary:last-child {
-                    margin-top: 0.1rem !important;
-                    padding-top: 0.1rem !important;
-                }
+                .no-print { display: none; }
+                .print-container { padding: 0.5rem !important; }
+                .print-table { font-size: 0.7rem !important; }
+                .summary { margin-top: 0.1rem !important; padding-top: 0.1rem !important; }
+                .summary p { font-size: 0.7rem !important; margin-bottom: 0 !important; }
+                .print-container .summary:last-child { margin-top: 0.1rem !important; padding-top: 0.1rem !important; }
             }
         </style>
-        <div class="no-print">
-            <button onclick="window.close()">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" style="width: 1rem; height: 1rem; fill: currentColor;"><path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H109.2L214.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg>
-                Späť
-            </button>
-            <button onclick="window.print()">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 1rem; height: 1rem; fill: currentColor;"><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64c0-17.7 14.3-32 32-32H352c17.7 0 32 14.3 32 32v96h64V64c0-35.3-28.7-64-64-64H128zM0 192c0-35.3 28.7-64 64-64H448c35.3 0 64 28.7 64 64v32V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V224 192zm64 64V416H448V256H64zM200 352h112c4.4 0 8-3.6 8-8c0-4.4-3.6-8-8-8H200c-4.4 0-8 3.6-8 8c0 4.4 3.6 8 8 8z"/></svg>
-                Tlačiť
-            </button>
-        </div>
-        <div class="print-container">
-            <div style="text-align: center; margin-bottom: 2rem;">
-                <h1 style="font-size: 2rem; font-weight: bold; margin-bottom: 0.5rem;">Prehľad rozpočtu</h1>
-                <p style="color: #4b5563;">Cyklus od ${cycleStartDateString} do ${cycleEndDateString}</p>
-            </div>
-            
-            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2rem; margin-bottom: 2rem;">
-                ${pieChartImage ? `
-                <div class="print-chart-container" style="flex: 1;">
-                    <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">Graf výdavkov</h2>
-                    <img src="${pieChartImage}" style="max-width: 100%; height: auto;">
-                </div>` : ''}
-                
-                <div style="flex: 1; min-width: 300px;">
-                    <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">Prehľad výdavkov</h2>
-                    <table class="print-table" style="min-width: 100%;">
-                        <thead>
-                            <tr style="background-color: #f3f4f6;">
-                                <th style="padding: 12px; color: #4b5563;">Dátum a položka</th>
-                                <th style="padding: 12px; color: #4b5563;">Suma (€)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${tableRows}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
 
-            ${budgetChartImage ? `
-            <div style="margin-top: 2rem;">
-                <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">Rozpočtové pravidlo (iba nastavené rozpočty)</h2>
-                <img src="${budgetChartImage}" style="max-width: 100%; height: auto;">
-            </div>
+        <div class="no-print">
+            <button onclick="window.close()">Späť</button>
+            <button onclick="window.print()">Tlačiť</button>
+        </div>
+
+        <div class="print-container">
+            <h1 style="text-align:center;font-size:2rem;margin-bottom:1rem;">Prehľad rozpočtu</h1>
+            <p style="text-align:center;color:#4b5563;">Cyklus od ${cycleStartDateString} do ${cycleEndDateString}</p>
+
+            ${pieChartImage ? `
+                <h2 style="margin-top:2rem;font-size:1.5rem;">Graf výdavkov</h2>
+                <img src="${pieChartImage}" style="max-width:100%; height:auto;">
             ` : ''}
 
-            <div class="summary" style="margin-top: 2rem; border-top: 1px solid #d1d5db; padding-top: 1rem;">
-                <p style="font-size: 1rem; margin-bottom: 0.25rem;">Celkový príjem: <span class="total">${dataToPrint.monthlyIncome.toFixed(2)} €</span></p>
-                <p style="font-size: 1rem; margin-bottom: 0.25rem;">Minul som: <span class="total">${totalSpent.toFixed(2)} €</span></p>
-                <p style="font-size: 1rem; margin-bottom: 0.25rem;">Zostáva mi: <span class="total">${remaining.toFixed(2)} €</span></p>
+            <h2 style="margin-top:2rem;font-size:1.5rem;">Podrobný zoznam výdavkov</h2>
+            <table class="print-table">
+                <thead>
+                    <tr><th>Dátum a položka</th><th>Suma (€)</th></tr>
+                </thead>
+                <tbody>${tableRows}</tbody>
+            </table>
+
+            ${budgetChartImage ? `
+                <h2 style="margin-top:2rem;font-size:1.5rem;">Rozpočtové kategórie</h2>
+                <img src="${budgetChartImage}" style="max-width:100%; height:auto;">
+            ` : ''}
+
+            <div class="summary" style="margin-top:2rem;border-top:1px solid #d1d5db;padding-top:1rem;">
+                <p>Celkový príjem: <span class="total">${dataToPrint.monthlyIncome.toFixed(2)} €</span></p>
+                <p>Minul som: <span class="total">${totalSpent.toFixed(2)} €</span></p>
+                <p>Zostáva mi: <span class="total">${remaining.toFixed(2)} €</span></p>
             </div>
+
+            <h2 style="margin-top:2rem;font-size:1.5rem;">Súhrn výdavkov podľa kategórie</h2>
+            <table class="print-table">
+                <thead>
+                    <tr><th>Kategória</th><th>Suma (€)</th></tr>
+                </thead>
+                <tbody>
+                    ${Object.entries(categoryTotals).map(([category, amount]) => `
+                        <tr>
+                            <td>${category}</td>
+                            <td>${amount.toFixed(2)} €</td>
+                        </tr>
+                    `).join('')}
+                    <tr style="font-weight:bold;background:#e5e7eb;">
+                        <td>CELKOM</td>
+                        <td>${totalSpent.toFixed(2)} €</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-    <!-- Súhrnná tabuľka pod grafom -->
-<div style="margin-top: 2rem;">
-    <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">
-        Súhrn výdavkov podľa kategórie
-    </h2>
+    `;
 
-    <table class="print-table" style="min-width: 100%;">
-        <thead>
-            <tr style="background-color: #f3f4f6;">
-                <th style="padding: 12px; color: #4b5563;">Kategória</th>
-                <th style="padding: 12px; color: #4b5563;">Suma (€)</th>
-            </tr>
-   </thead>
-<tbody>
-    ${Object.entries(categoryTotals).map(([category, amount]) => `
-        <tr class="border-b border-gray-200">
-            <td class="py-3 px-6 text-left whitespace-nowrap">${category}</td>
-            <td class="py-3 px-6 text-left font-bold" style="color:#1f2937;">
-                ${amount.toFixed(2)} €
-            </td>
-        </tr>
-    `).join('')}
+    const printWindow = window.open('', '_blank', 'width=900,height=700');
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.focus();
+} // koniec funkcie handlePrintChartAndTable
 
-    <tr style="background-color: #e5e7eb; font-weight: bold;">
-        <td class="py-3 px-6 text-left">CELKOM</td>
-        <td class="py-3 px-6 text-left">${totalSpent.toFixed(2)} €</td>
-    </tr>
-</tbody>
-</table>
-</div>
-`;
-    
-const printWindow = window.open('', '_blank', 'width=900,height=700');
-printWindow.document.write(printContent);
-printWindow.document.close();
-printWindow.focus();
-}  // koniec funkcie handlePrintChartAndTable
-
-function updateCycleDatesDisplay(start = cycleStartDate, end = null) {
-    ...
-}
-</script>
-
-
-</script>
 
 
 
@@ -1321,6 +1252,7 @@ document.getElementById('delete-history-btn').addEventListener('click', handleDe
 </script>
 </body>
 </html>
+
 
 
 
