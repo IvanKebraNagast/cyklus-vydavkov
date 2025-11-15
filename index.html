@@ -316,7 +316,8 @@ function loadDataFromLocalStorage() {
     expenses = data.expenses || [];
     monthlyIncome = data.monthlyIncome || 0;
     monthlyBudget = data.monthlyBudget || {};
-    customCategories = data.customCategories || [];
+   customCategories = Array.isArray(data.customCategories) ? data.customCategories : [];
+
     cycleStartDate = data.cycleStartDate ? new Date(data.cycleStartDate) : null;
   }
 
@@ -346,10 +347,10 @@ function renderCategorySelectors() {
     bcat.innerHTML += `<option value="${c}">${c}</option>`;
   });
 
-  // MOŽNOSŤ PRIDAŤ VLASTNÚ
-  cat.innerHTML += `<option value="custom">+ Vlastná položka</option>`;
-  bcat.innerHTML += `<option value="custom">+ Vlastná položka</option>`;
-}
+  // MOŽNOSŤ PRIDAŤ VLASTNÚ (vždy dostupná)
+cat.innerHTML += '<option value="custom">➕ Vlastná položka</option>';
+bcat.innerHTML += '<option value="custom">➕ Vlastná položka</option>';
+
 
 
 
@@ -717,6 +718,7 @@ function updateBudgetRuleChart() {
 
 // === PRIDÁVANIE VÝDAVKU ===
 function handleAddExpense() {
+ function handleAddExpense() {
   if (istoryView) {
     showMessage("V histórii nemôžeš pridávať výdavky.", "error");
     return;
@@ -724,22 +726,50 @@ function handleAddExpense() {
 
   let category = document.getElementById("expense-category").value;
 
+  // Ak je vlastná kategória
   if (category === "custom") {
     category = document.getElementById("expense-custom-category").value.trim();
 
     if (!category) {
-        showMessage("Zadaj názov vlastnej položky.", "error");
-        return;
+      showMessage("Zadaj názov vlastnej položky.", "error");
+      return;
     }
+
+    // Uložíme novú vlastnú kategóriu
+    customCategories.push(category);
+    saveDataToLocalStorage();
+    renderCategorySelectors();
+  }
+
+  const amount = parseFloat(document.getElementById("expense-amount").value);
+
+  if (isNaN(amount) || amount <= 0) {
+    showMessage("Zadaj platnú sumu.", "error");
+    return;
+  }
+
+  if (!cycleStartDate) cycleStartDate = new Date();
+
+  expenses.push({
+    date: new Date().toISOString(),
+    category,
+    amount
+  });
+
+  saveDataToLocalStorage();
+  renderAllUI();
+
+  document.getElementById("expense-amount").value = "";
+
+  showMessage("Výdavok pridaný!", "success");
+}
+
 
     // uložíme novú vlastnú položku
     customCategories.push(category);
     saveDataToLocalStorage();
     renderCategorySelectors();
-}
 
-  
-  }
 
   const amount = parseFloat(document.getElementById("expense-amount").value);
 
@@ -904,6 +934,7 @@ if ("serviceWorker" in navigator) {
 </script>
 </body>
 </html>
+
 
 
 
