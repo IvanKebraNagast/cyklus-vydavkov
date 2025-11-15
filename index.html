@@ -402,8 +402,19 @@ function showConfirmationDialog(message, onConfirm) {
 
 // === Handlery ===
 async function handleAddExpense() {
-  if (isHistoryView) { showMessage('Nemôžete pridávať výdavky do historického cyklu.', 'error'); return; }
-  const expenseCategory = document.getElementById('expense-category').value;
+     if (isHistoryView) {
+    showMessage('Nemôžete pridávať výdavky do historického cyklu.', 'error');
+    return;
+  }
+
+  let expenseCategory = document.getElementById('expense-category').value;
+
+  if (expenseCategory === "custom") {
+    expenseCategory = document.getElementById('custom-category').value.trim();
+  }
+
+
+
   const expenseAmount = parseFloat(document.getElementById('expense-amount').value);
   if (isNaN(expenseAmount) || expenseAmount <= 0) { showMessage('Prosím, zadajte platnú sumu.', 'error'); return; }
   if (!cycleStartDate) cycleStartDate = new Date();
@@ -687,3 +698,4 @@ if ('serviceWorker' in navigator) {
 </script>
 </body>
 </html>
+
