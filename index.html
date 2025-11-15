@@ -12,11 +12,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Sledovanie výdavkov">
-
-<!-- (Voliteľné) Ak pridáš ikonky ako súbory, odkomentuj a vlož správne cesty
-<link rel="apple-touch-icon" href="/cyklus-vydavkov/icons/icon-180.png">
---><link rel="apple-touch-icon" href="/cyklus-vydavkov/icon.png">
-
+<link rel="apple-touch-icon" href="/cyklus-vydavkov/icon.png">
 
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
@@ -42,7 +38,6 @@ body { font-family: 'Inter', sans-serif; }
 .print-chart-container, .print-table-container { flex: 1; min-width: 300px; }
 .print-legend { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; }
 .print-legend-item { display: flex; align-items: center; }
-
 .print-legend-color { width: 1rem; height: 1rem; border-radius: 9999px; }
 .print-table { width: 100%; border-collapse: collapse; text-align: left; margin-top: 1rem; }
 .print-table th, .print-table td { border: 1px solid #d1d5db; padding: 0.75rem; }
@@ -64,159 +59,157 @@ body { font-family: 'Inter', sans-serif; }
 </head>
 <body class="bg-gray-100 flex min-h-screen p-4">
 
-<!-- Hlavný obsah aplikácie -->
 <div id="main-content" class="container mx-auto bg-white shadow-xl rounded-2xl p-8 space-y-8 max-w-4xl">
 
 <header class="text-center">
-<h1 class="text-4xl font-bold text-blue-900 mb-2">Sledovanie výdavkov</h1>
-<div class="inline-block px-4 py-1.5 bg-gray-200 rounded-full text-gray-700 text-sm font-medium">
-Vytvoril: IvanKebraNagast
-</div>
-<p id="cycle-dates" class="text-gray-600">
-Sledovanie rozpočtu.
-</p>
+  <h1 class="text-4xl font-bold text-blue-900 mb-2">Sledovanie výdavkov</h1>
+  <div class="inline-block px-4 py-1.5 bg-gray-200 rounded-full text-gray-700 text-sm font-medium">
+    Vytvoril: IvanKebraNagast
+  </div>
+  <p id="cycle-dates" class="text-gray-600">
+    Sledovanie rozpočtu.
+  </p>
 </header>
 
-<!-- Sekcia pre správu cyklov -->
 <section class="bg-gray-50 p-6 rounded-xl border border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4 no-print">
-<h2 class="text-xl font-bold text-gray-800">Správa cyklov</h2>
-<div class="flex gap-4 w-full md:w-auto">
-<button id="start-new-cycle-btn" class="flex-1 px-6 py-2.5 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 focus:ring-4 focus:ring-blue-500 focus:outline-none">
-Ukončiť aktuálny cyklus a začať nový
-</button>
-<button id="view-history-btn" class="flex-1 px-6 py-2.5 bg-gray-600 text-white font-bold rounded-lg shadow-md hover:bg-gray-700 focus:ring-4 focus:ring-gray-500 focus:outline-none">
-Zobraziť históriu
-</button>
-</div>
+  <h2 class="text-xl font-bold text-gray-800">Správa cyklov</h2>
+  <div class="flex gap-4 w-full md:w-auto">
+    <button id="start-new-cycle-btn" class="flex-1 px-6 py-2.5 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 focus:ring-4 focus:ring-blue-500 focus:outline-none">
+      Ukončiť aktuálny cyklus a začať nový
+    </button>
+    <button id="view-history-btn" class="flex-1 px-6 py-2.5 bg-gray-600 text-white font-bold rounded-lg shadow-md hover:bg-gray-700 focus:ring-4 focus:ring-gray-500 focus:outline-none">
+      Zobraziť históriu
+    </button>
+  </div>
 </section>
 
-<!-- Zjednotená sekcia s formulármi pre aktuálny cyklus -->
 <div id="current-cycle-forms">
-<section class="bg-gray-50 p-6 rounded-xl border border-gray-200 grid grid-cols-1 md:grid-cols-3 gap-4 no-print">
-<div class="flex flex-col items-start space-y-2">
-<label for="monthly-income-input" class="text-sm font-medium text-gray-700">Celkový príjem (€)</label>
-<input type="number" id="monthly-income-input" placeholder="0.00" step="0.01" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
-<button id="save-income-btn" class="w-full px-6 py-2.5 bg-green-600 text-white font-bold rounded-lg shadow-md hover:bg-green-700 focus:ring-4 focus:ring-green-500 focus:outline-none">Uložiť príjem</button>
-</div>
-<div class="flex flex-col items-center justify-center bg-blue-100 p-4 rounded-lg">
-<span class="text-sm font-medium text-blue-800">Minul som</span>
-<span id="total-spent" class="text-2xl font-bold text-blue-600 mt-1">0.00 €</span>
-</div>
-<div id="remaining-budget-container" class="flex flex-col items-center justify-center p-4 rounded-lg">
-<span class="text-sm font-medium text-green-800">Zostáva mi</span>
-<span id="remaining-budget" class="text-2xl font-bold mt-1">0.00 €</span>
-</div>
-</section>
+  <section class="bg-gray-50 p-6 rounded-xl border border-gray-200 grid grid-cols-1 md:grid-cols-3 gap-4 no-print">
+    <div class="flex flex-col items-start space-y-2">
+      <label for="monthly-income-input" class="text-sm font-medium text-gray-700">Celkový príjem (€)</label>
+      <input type="number" id="monthly-income-input" placeholder="0.00" step="0.01" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
+      <button id="save-income-btn" class="w-full px-6 py-2.5 bg-green-600 text-white font-bold rounded-lg shadow-md hover:bg-green-700 focus:ring-4 focus:ring-green-500 focus:outline-none">Uložiť príjem</button>
+    </div>
+    <div class="flex flex-col items-center justify-center bg-blue-100 p-4 rounded-lg">
+      <span class="text-sm font-medium text-blue-800">Minul som</span>
+      <span id="total-spent" class="text-2xl font-bold text-blue-600 mt-1">0.00 €</span>
+    </div>
+    <div id="remaining-budget-container" class="flex flex-col items-center justify-center p-4 rounded-lg">
+      <span class="text-sm font-medium text-green-800">Zostáva mi</span>
+      <span id="remaining-budget" class="text-2xl font-bold mt-1">0.00 €</span>
+    </div>
+  </section>
 
-<section class="bg-gray-50 p-6 rounded-xl border border-gray-200 no-print">
-<h2 class="text-2xl font-bold text-gray-800 mb-4">Rozpočtové pravidlo</h2>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-<div class="input-group">
-<label for="budget-category-select" class="block text-sm text-gray-700 mb-1">Položka pre rozpočet</label>
-<select id="budget-category-select" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white">
-</select>
-</div>
-<div class="input-group">
-<label for="budget-amount-input" class="block text-sm text-gray-700 mb-1">Rozpočet (€)</label>
-<input type="number" id="budget-amount-input" placeholder="100.00" step="0.01" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
-</div>
-<button id="save-budget-btn" class="w-full px-6 py-2.5 bg-yellow-600 text-white font-bold rounded-lg shadow-md hover:bg-yellow-700 focus:ring-4 focus:ring-yellow-500 focus:outline-none">
-Uložiť rozpočet
-</button>
-</div>
-<div id="budget-bar-chart-container" class="relative w-full max-w-2xl mx-auto mt-6 hidden">
-<canvas id="budget-bar-chart"></canvas>
-</div>
-<div id="budget-status-container" class="mt-6 space-y-4"></div>
-</section>
+  <section class="bg-gray-50 p-6 rounded-xl border border-gray-200 no-print">
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">Rozpočtové pravidlo</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+      <div class="input-group">
+        <label for="budget-category-select" class="block text-sm text-gray-700 mb-1">Položka pre rozpočet</label>
+        <select id="budget-category-select" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"></select>
+      </div>
+      <div class="input-group">
+        <label for="budget-amount-input" class="block text-sm text-gray-700 mb-1">Rozpočet (€)</label>
+        <input type="number" id="budget-amount-input" placeholder="100.00" step="0.01" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
+      </div>
+      <button id="save-budget-btn" class="w-full px-6 py-2.5 bg-yellow-600 text-white font-bold rounded-lg shadow-md hover:bg-yellow-700 focus:ring-4 focus:ring-yellow-500 focus:outline-none">
+        Uložiť rozpočet
+      </button>
+    </div>
+    <div id="budget-bar-chart-container" class="relative w-full max-w-2xl mx-auto mt-6 hidden">
+      <canvas id="budget-bar-chart"></canvas>
+    </div>
+    <div id="budget-status-container" class="mt-6 space-y-4"></div>
+  </section>
 
-<section class="bg-gray-50 p-6 rounded-xl border border-gray-200 no-print">
-<h2 class="text-2xl font-bold text-gray-800 mb-4">Pridať nový výdavok</h2>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-<div class="input-group">
-<label for="expense-category" class="block text-sm text-gray-700 mb-1">Položka</label>
-<select id="expense-category" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white">
-</select>
-</div>
-<div class="input-group">
-<label for="expense-amount" class="block text-sm text-gray-700 mb-1">Suma (€)</label>
-<input type="number" id="expense-amount" placeholder="50.00" step="0.01" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
-</div>
-<button id="add-expense-btn" class="w-full px-6 py-2.5 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 focus:ring-4 focus:ring-blue-500 focus:outline-none">
-Pridať
-</button>
-</div>
-</section>
+  <section class="bg-gray-50 p-6 rounded-xl border border-gray-200 no-print">
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">Pridať nový výdavok</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+      <div class="input-group">
+        <label for="expense-category" class="block text-sm text-gray-700 mb-1">Položka</label>
+        <select id="expense-category" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"></select>
+      </div>
+      <div class="input-group">
+        <label for="expense-amount" class="block text-sm text-gray-700 mb-1">Suma (€)</label>
+        <input type="number" id="expense-amount" placeholder="50.00" step="0.01" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
+      </div>
+      <button id="add-expense-btn" class="w-full px-6 py-2.5 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 focus:ring-4 focus:ring-blue-500 focus:outline-none">
+        Pridať
+      </button>
+    </div>
+  </section>
 </div>
 
 <div id="history-view-message" class="hidden bg-gray-200 p-6 rounded-xl text-center">
-<p class="text-xl font-bold text-gray-700">Momentálne prezeráte historický cyklus.</p>
-<p class="text-sm text-gray-600 mt-2">Dáta sú len na čítanie. Ak chcete pridávať výdavky, vráťte sa k aktuálnemu cyklu.</p>
+  <p class="text-xl font-bold text-gray-700">Momentálne prezeráte historický cyklus.</p>
+  <p class="text-sm text-gray-600 mt-2">Dáta sú len na čítanie. Ak chcete pridávať výdavky, vráťte sa k aktuálnemu cyklu.</p>
 </div>
 
 <section class="flex flex-col lg:flex-row gap-8">
-<div id="pie-chart-section" class="flex-1 bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center">
-<h2 class="text-2xl font-bold text-gray-800 mb-4">Graf výdavkov</h2>
-<div class="relative w-full max-w-sm flex flex-col items-center">
-<canvas id="expense-pie-chart"></canvas>
-<div id="chart-legend" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-700"></div>
-</div>
-</div>
+  <div id="pie-chart-section" class="flex-1 bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center">
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">Graf výdavkov</h2>
+    <div class="relative w-full max-w-sm flex flex-col items-center">
+      <canvas id="expense-pie-chart"></canvas>
+      <div id="chart-legend" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-700"></div>
+      <!-- ZHRNUTIE POD GRAFOM -->
+      <div id="chart-summary" class="mt-6 text-sm text-gray-800 font-medium w-full"></div>
+    </div>
+  </div>
 
-<div class="flex-1 bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-sm overflow-x-auto flex flex-col">
-<h2 class="text-2xl font-bold text-gray-800 mb-4">Prehľad výdavkov</h2>
-<div class="table-container">
-<table class="min-w-full table-auto text-center">
-<thead>
-<tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-<th class="py-3 px-6 text-left">Dátum a položka</th>
-<th class="py-3 px-6 text-left">Suma (€)</th>
-</tr>
-</thead>
-<tbody id="expense-table-body" class="text-gray-700 text-sm font-light"></tbody>
-</table>
-</div>
-<button id="delete-current-cycle-btn" class="mt-4 w-full px-6 py-2.5 bg-red-600 text-white font-bold rounded-lg shadow-md hover:bg-red-700 focus:ring-4 focus:ring-red-500 focus:outline-none no-print">
-Vymazať dáta aktuálneho cyklus
-</button>
-</div>
+  <div class="flex-1 bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-sm overflow-x-auto flex flex-col">
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">Prehľad výdavkov</h2>
+    <div class="table-container">
+      <table class="min-w-full table-auto text-center">
+        <thead>
+          <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+            <th class="py-3 px-6 text-left">Dátum a položka</th>
+            <th class="py-3 px-6 text-left">Suma (€)</th>
+          </tr>
+        </thead>
+        <tbody id="expense-table-body" class="text-gray-700 text-sm font-light"></tbody>
+      </table>
+    </div>
+    <button id="delete-current-cycle-btn" class="mt-4 w-full px-6 py-2.5 bg-red-600 text-white font-bold rounded-lg shadow-md hover:bg-red-700 focus:ring-4 focus:ring-red-500 focus:outline-none no-print">
+      Vymazať dáta aktuálneho cyklus
+    </button>
+  </div>
 </section>
 
 <section class="mt-4 flex justify-center">
-<button id="print-all-btn" class="flex items-center gap-2 px-6 py-2.5 bg-gray-600 text-white font-bold rounded-lg shadow-md hover:bg-gray-700 focus:ring-4 focus:ring-gray-500 focus:outline-none">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 1rem; height: 1rem; fill: currentColor;"><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64c0-17.7 14.3-32 32-32H352c17.7 0 32 14.3 32 32v96h64V64c0-35.3-28.7-64-64-64H128zM0 192c0-35.3 28.7-64 64-64H448c35.3 0 64 28.7 64 64v32V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V224 192zm64 64V416H448V256H64zM200 352h112c4.4 0 8-3.6 8-8c0-4.4-3.6-8-8-8H200c-4.4 0-8 3.6-8 8c0 4.4 3.6 8 8 8z"/></svg>
-Tlačiť
-</button>
+  <button id="print-all-btn" class="flex items-center gap-2 px-6 py-2.5 bg-gray-600 text-white font-bold rounded-lg shadow-md hover:bg-gray-700 focus:ring-4 focus:ring-gray-500 focus:outline-none">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 1rem; height: 1rem; fill: currentColor;"><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64c0-17.7 14.3-32 32-32H352c17.7 0 32 14.3 32 32v96h64V64c0-35.3-28.7-64-64-64H128zM0 192c0-35.3 28.7-64 64-64H448c35.3 0 64 28.7 64 64v32V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V224 192zm64 64V416H448V256H64zM200 352h112c4.4 0 8-3.6 8-8c0-4.4-3.6-8-8-8H200c-4.4 0-8 3.6-8 8c0 4.4 3.6 8 8 8z"/></svg>
+    Tlačiť
+  </button>
 </section>
 
 <div id="message-box" class="fixed bottom-4 left-1/2 -translate-x-1/2 p-4 rounded-xl shadow-lg transition-all duration-300 hidden no-print" style="transform: translateX(-50%);">
-<p id="message-text" class="font-medium text-white"></p>
+  <p id="message-text" class="font-medium text-white"></p>
 </div>
 
 <div id="confirmation-dialog" class="modal fixed inset-0 flex items-center justify-center p-4 z-50 hidden no-print">
-<div class="modal-content bg-white rounded-xl shadow-2xl p-8 max-w-sm mx-auto space-y-6">
-<h3 class="text-2xl font-bold text-gray-800">Potvrdenie</h3>
-<p id="confirmation-message" class="text-gray-700">Naozaj chcete ukoniť aktuálny rozpočtový cyklus a začať nový? Aktuálne dáta budú uložené a aplikácia sa vynuluje.</p>
-<div class="flex justify-end gap-4">
-<button id="cancel-btn" class="px-6 py-2.5 bg-gray-300 text-gray-800 font-bold rounded-lg hover:bg-gray-400">Zrušiť</button>
-<button id="confirm-btn" class="px-6 py-2.5 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700">Potvrdiť</button>
+  <div class="modal-content bg-white rounded-xl shadow-2xl p-8 max-w-sm mx-auto space-y-6">
+    <h3 class="text-2xl font-bold text-gray-800">Potvrdenie</h3>
+    <p id="confirmation-message" class="text-gray-700">Naozaj chcete ukoniť aktuálny rozpočtový cyklus a začať nový? Aktuálne dáta budú uložené a aplikácia sa vynuluje.</p>
+    <div class="flex justify-end gap-4">
+      <button id="cancel-btn" class="px-6 py-2.5 bg-gray-300 text-gray-800 font-bold rounded-lg hover:bg-gray-400">Zrušiť</button>
+      <button id="confirm-btn" class="px-6 py-2.5 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700">Potvrdiť</button>
+    </div>
+  </div>
 </div>
-</div>
-</div>
+
 </div>
 
 <div id="history-sidebar" class="sidebar fixed top-0 right-0 h-full w-80 bg-gray-900 text-white p-6 transform translate-x-full z-40 shadow-lg overflow-y-auto no-print">
-<div class="flex justify-between items-center mb-6">
-<h2 class="text-2xl font-bold">História cyklov</h2>
-<button id="close-history-btn" class="text-2xl font-bold hover:text-gray-400">×</button>
-</div>
-<div id="history-list" class="space-y-4"></div>
-<button id="delete-history-btn" class="mt-4 w-full px-6 py-2.5 bg-red-600 text-white font-bold rounded-lg shadow-md hover:bg-red-700 focus:ring-4 focus:ring-red-500 focus:outline-none">
-Vymazať celú históriu
-</button>
-<button id="back-to-current-btn" class="mt-4 w-full px-6 py-2.5 bg-gray-500 text-white font-bold rounded-lg shadow-md hover:bg-gray-600 focus:ring-4 focus:ring-gray-400 focus:outline-none">
-Späť na aktuálny cyklus
-</button>
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold">História cyklov</h2>
+    <button id="close-history-btn" class="text-2xl font-bold hover:text-gray-400">×</button>
+  </div>
+  <div id="history-list" class="space-y-4"></div>
+  <button id="delete-history-btn" class="mt-4 w-full px-6 py-2.5 bg-red-600 text-white font-bold rounded-lg shadow-md hover:bg-red-700 focus:ring-4 focus:ring-red-500 focus:outline-none">
+    Vymazať celú históriu
+  </button>
+  <button id="back-to-current-btn" class="mt-4 w-full px-6 py-2.5 bg-gray-500 text-white font-bold rounded-lg shadow-md hover:bg-gray-600 focus:ring-4 focus:ring-gray-400 focus:outline-none">
+    Späť na aktuálny cyklus
+  </button>
 </div>
 
 <div class="print-area"></div>
@@ -233,6 +226,40 @@ let messageTimeout;
 let cycleStartDate = null;
 let isHistoryView = false;
 let historicalCycles = [];
+
+// === PLUGIN – TEXTY V KOLÁČI ===
+const pieLabelsPlugin = {
+  id: 'pieLabelsPlugin',
+  afterDraw(chart, args, options) {
+    const { ctx, data } = chart;
+    const meta = chart.getDatasetMeta(0);
+    if (!meta || !meta.data || !meta.data.length) return;
+
+    const total = data.datasets[0].data.reduce((s, v) => s + v, 0);
+    ctx.save();
+    meta.data.forEach((slice, i) => {
+      const value = data.datasets[0].data[i];
+      if (!value) return;
+      const percent = total > 0 ? ((value / total) * 100).toFixed(0) : 0;
+      const label = `${data.labels[i]} ${percent}%`;
+
+      const angle = (slice.startAngle + slice.endAngle) / 2;
+      const radius = slice.outerRadius * 0.65;
+      const x = slice.x + radius * Math.cos(angle);
+      const y = slice.y + radius * Math.sin(angle);
+
+      ctx.fillStyle = "#000";
+      ctx.font = "bold 12px Inter, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.shadowColor = "rgba(255,255,255,0.9)";
+      ctx.shadowBlur = 4;
+      ctx.fillText(label, x, y);
+      ctx.shadowBlur = 0;
+    });
+    ctx.restore();
+  }
+};
 
 // Kategórie
 const expenseCategories = [
@@ -437,21 +464,65 @@ function renderTable() {
 function updateChart() {
   const colors = ['#EF4444','#3B82F6','#F59E0B','#10B981','#6366F1','#EC4899','#34D399','#F97316','#A78BFA','#D946EF','#4B5563','#9CA3AF'];
   const totals = expenses.reduce((a,e)=>{ a[e.category]=(a[e.category]||0)+e.amount; return a; },{});
-  const labels = Object.keys(totals); const data = Object.values(totals);
+  const labels = Object.keys(totals);
+  const data = Object.values(totals);
   const totalAmount = data.reduce((s,v)=>s+v,0);
+
   const legend = document.getElementById('chart-legend'); legend.innerHTML='';
   labels.forEach((label,i)=>{
     const d=document.createElement('div'); d.className='flex items-center space-x-2';
     d.innerHTML=`<span class="w-4 h-4 rounded-full" style="background-color:${colors[i%colors.length]};"></span><span>${label}: ${data[i].toFixed(2)} €</span>`;
     legend.appendChild(d);
   });
+
   if (pieChart) pieChart.destroy();
-  const ctx = document.getElementById('expense-pie-chart').getContext('2d');
+  const canvas = document.getElementById('expense-pie-chart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
   pieChart = new Chart(ctx, {
     type:'pie',
-    data:{ labels, datasets:[{ data, backgroundColor:colors, borderColor:'#fff', borderWidth:2 }] },
-    options:{ responsive:true, plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:(t)=>{ const v=t.raw; const p=totalAmount>0?((v/totalAmount)*100).toFixed(2):0; return `${t.label}: ${v.toFixed(2)} € (${p}%)`; }}}}}
+    data:{
+      labels,
+      datasets:[{
+        data,
+        backgroundColor:colors,
+        borderColor:'#fff',
+        borderWidth:2
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{
+        legend:{ display:false },
+        tooltip:{
+          callbacks:{
+            label:(t)=>{
+              const v=t.raw;
+              const p=totalAmount>0?((v/totalAmount)*100).toFixed(2):0;
+              return `${t.label}: ${v.toFixed(2)} € (${p}%)`;
+            }
+          }
+        }
+      }
+    },
+    plugins:[pieLabelsPlugin]
   });
+
+  // Sumár pod grafom
+  const summaryBox = document.getElementById('chart-summary');
+  if (labels.length === 0) {
+    summaryBox.innerHTML = '<p class="text-center text-gray-500">Zatiaľ žiadne dáta na zobrazenie.</p>';
+  } else {
+    let html = '';
+    labels.forEach((label, i)=>{
+      html += `<div class="flex justify-between border-b border-dashed border-gray-200 py-1">
+                 <span>${label}</span>
+                 <span class="font-semibold">${data[i].toFixed(2)} €</span>
+               </div>`;
+    });
+    summaryBox.innerHTML = html;
+  }
 }
 function updateBudgetRuleChart() {
   const container = document.getElementById('budget-bar-chart-container');
@@ -607,7 +678,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('delete-history-btn').addEventListener('click', handleDeleteHistory);
 });
 
-// === Registrácia Service Workera (PWA podmienka na iOS) ===
+// === Registrácia Service Workera (PWA) ===
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/cyklus-vydavkov/sw.js').catch(()=>{ /* ignore */ });
@@ -616,4 +687,3 @@ if ('serviceWorker' in navigator) {
 </script>
 </body>
 </html>
-
