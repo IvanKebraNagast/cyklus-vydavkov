@@ -726,14 +726,19 @@ function handleAddExpense() {
 
   if (category === "custom") {
     category = document.getElementById("expense-custom-category").value.trim();
+
     if (!category) {
-      showMessage("Zadaj názov vlastnej položky.", "error");
-      return;
+        showMessage("Zadaj názov vlastnej položky.", "error");
+        return;
     }
 
+    // uložíme novú vlastnú položku
     customCategories.push(category);
     saveDataToLocalStorage();
     renderCategorySelectors();
+}
+
+  
   }
 
   const amount = parseFloat(document.getElementById("expense-amount").value);
@@ -899,5 +904,6 @@ if ("serviceWorker" in navigator) {
 </script>
 </body>
 </html>
+
 
 
