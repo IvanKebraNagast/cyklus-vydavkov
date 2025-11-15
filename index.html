@@ -83,7 +83,7 @@ body {
     font-weight: bold;
     padding: 0.75rem 1.5rem;
     border-radius: 0.5rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1-2px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 6px -1-2px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     transition: background-color 0.2s ease-in-out;
     cursor: pointer;
     border: none;
@@ -172,12 +172,20 @@ Uložiť rozpočet
 <section class="bg-gray-50 p-6 rounded-xl border border-gray-200 no-print">
 <h2 class="text-2xl font-bold text-gray-800 mb-4">Pridať nový výdavok</h2>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-<div class="input-group">
+<div class="input-group" id="expense-category-container">
 <label for="expense-category" class="block text-sm text-gray-700 mb-1">Položka</label>
 <select id="expense-category" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white">
-<!-- Options will be added dynamically -->
+<!-- Options will be added dynamically, including "Vlastná položka" -->
 </select>
 </div>
+
+<!-- NOVÉ POLE PRE VLASTNÚ KATEGÓRIU -->
+<div class="input-group hidden" id="custom-category-input-group">
+<label for="custom-category-input" class="block text-sm text-gray-700 mb-1">Vlastná položka</label>
+<input type="text" id="custom-category-input" placeholder="Napr. Darček pre Petra" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
+</div>
+<!-- KONIEC NOVÉHO POĽA -->
+
 <div class="input-group">
 <label for="expense-amount" class="block text-sm text-gray-700 mb-1">Suma (€)</label>
 <input type="number" id="expense-amount" placeholder="50.00" step="0.01" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
@@ -280,7 +288,9 @@ Späť na aktuálny cyklus
 <!-- Kontajner pre tlač - viditeľný iba pri tlači, už sa nepoužíva, je to nahradené priamym zápisom do nového okna -->
 <div class="print-area"></div>
 
+<!-- Pridaný plugin pre zobrazenie dátových návestí (data labels) -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <script>
 // Global variables for application state
 let expenses = [];
@@ -297,7 +307,7 @@ const archiveKeyPrefix = 'expenseTrackerData-archived-';
 let isHistoryView = false;
 
 // Expense categories
-const expenseCategories = [
+let expenseCategories = [
 'Nájomné',
 'Internet',
 'Elektrika',
@@ -311,6 +321,20 @@ const expenseCategories = [
 'Alkohol',
 'Ostatné'
 ];
+
+// NOVÁ KONŠTANTA PRE VLASTNÚ POLOŽKU
+const CUSTOM_CATEGORY_OPTION = 'CUSTOM_CATEGORY_INPUT';
+
+/**
+* Combines initial categories with any custom categories saved in expenses/budgets.
+*/
+function getAllCategories() {
+    let allCategories = new Set(expenseCategories);
+    expenses.forEach(e => allCategories.add(e.category));
+    Object.keys(monthlyBudget).forEach(b => allCategories.add(b));
+    return Array.from(allCategories).sort();
+}
+
 
 /**
 * Saves the current application state to localStorage.
@@ -355,6 +379,9 @@ const budgetRuleSection = document.querySelector('section:nth-of-type(3)');
 const deleteBtn = document.getElementById('delete-current-cycle-btn');
 const printBtn = document.getElementById('print-all-btn');
 
+// MUSÍ BYŤ PRVÉ: Prekreslí všetky dropdown menu
+renderUI(); 
+
 if (isHistoryView) {
 currentFormsEl.classList.add('hidden');
 chartSection.classList.add('hidden');
@@ -371,7 +398,7 @@ historyMessageEl.classList.add('hidden');
 printBtn.textContent = 'Vytlačiť prehľad';
 updateChart();
 updateBudgetRuleChart();
-// NOVÁ FUNKCIA: Zobrazenie stavu rozpočtov
+// Zobrazenie stavu rozpočtov
 updateBudgetStatus();
 }
 
@@ -411,7 +438,7 @@ saveDataToLocalStorage();
 
 document.getElementById('monthly-income-input').value = '';
 document.getElementById('budget-amount-input').value = '';
-renderUI();
+renderAllUI(); // Používame renderAllUI, aby sa prekreslili aj dropdown menu
 isHistoryView = false;
 renderAllUI();
 
@@ -606,12 +633,23 @@ showMessage('Nemôžete pridávať výdavky do historického cyklu. Vráťte sa 
 return;
 }
 
-const expenseCategory = document.getElementById('expense-category').value;
 const expenseAmount = parseFloat(document.getElementById('expense-amount').value);
 
 if (isNaN(expenseAmount) || expenseAmount <= 0) {
 showMessage('Prosím, zadajte platnú sumu.', 'error');
 return;
+}
+
+let expenseCategory = document.getElementById('expense-category').value;
+const customCategoryInput = document.getElementById('custom-category-input');
+
+if (expenseCategory === CUSTOM_CATEGORY_OPTION) {
+    // Ak je zvolená vlastná položka, použije sa hodnota z textového poľa
+    expenseCategory = customCategoryInput.value.trim();
+    if (expenseCategory === '') {
+        showMessage('Prosím, zadajte názov vlastnej položky.', 'error');
+        return;
+    }
 }
 
 expenses.push({
@@ -620,10 +658,15 @@ category: expenseCategory,
 amount: expenseAmount,
 });
 showMessage(`Výdavok bol úspešne pridaný!`, 'success');
+
+// Vynulovanie formulára
 document.getElementById('expense-amount').value = '';
+document.getElementById('expense-category').value = expenseCategories[0] || ''; // Nastaví späť na prvú kategóriu
+customCategoryInput.value = '';
+document.getElementById('custom-category-input-group').classList.add('hidden'); // Skryje pole pre vlastnú kategóriu
 
 saveDataToLocalStorage();
-renderAllUI();
+renderAllUI(); // MUSÍ BYŤ renderAllUI, aby sa aktualizovali dropdown menu, ak bola pridaná nová kategória
 }
 
 function handleDeleteCurrentCycle() {
@@ -739,9 +782,12 @@ expenseTableBody.appendChild(row);
 });
 }
 
+/**
+ * Updated function to include Chart.js Data Labels plugin for percentage display on pie slices.
+ */
 function updateChart() {
 const backgroundColors = [
-'#EF4444', '#3B82F6', '#F59E0B', '#10B981', '#6366F1', '#EC4899', '#34D399', '#F97316', '#A78BFA', '#D946EF', '#4B5563', '#9CA3AF'
+'#EF4444', '#3B82F6', '#F59E0B', '#10B981', '#6366F1', '#EC4899', '#34D399', '#F97316', '#A78BFA', '#D946EF', '#4B5563', '#9CA3AF', '#CC33FF', '#FF6633', '#0099CC', '#99FF33'
 ];
 
 const categoryTotals = expenses.reduce((acc, expense) => {
@@ -794,8 +840,27 @@ return `${tooltipItem.label}: ${value.toFixed(2)} € (${percentage}%)`;
 }
 }
 },
+// Konfigurácia pre datové návesti (Data Labels)
+datalabels: {
+// Formátovanie textu: Kategória + Percento
+formatter: (value, context) => {
+const total = context.dataset.data.reduce((a, b) => a + b, 0);
+const percentage = (value / total * 100).toFixed(1) + "%";
+return context.chart.data.labels[context.dataIndex] + '\n' + percentage;
+},
+color: '#fff', // Biela farba textu
+font: {
+weight: 'bold',
+size: 10,
+},
+// Umiestnenie návestí uprostred výseku
+anchor: 'center',
+align: 'center',
+},
 }
 },
+// Registrácia pluginu pre správne fungovanie
+plugins: [ChartDataLabels] 
 });
 }
 
@@ -1065,7 +1130,7 @@ async function handlePrintChartAndTable() {
 
             ${budgetChartImage ? `
             <div style="margin-top: 2rem;">
-                <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">Rozpočtové pravidlo</h2>
+                <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">Rozpočtové pravidlo (iba nastavené rozpočty)</h2>
                 <img src="${budgetChartImage}" style="max-width: 100%; height: auto;">
             </div>
             ` : ''}
@@ -1106,32 +1171,98 @@ cycleDatesEl.textContent = `Začnite pridávaním výdavkov alebo príjmov, aby 
 }
 }
 
+/**
+ * Renders dropdowns and manages the visibility of the custom category input.
+ */
 function renderUI() {
-const categorySelect = document.getElementById('expense-category');
-const budgetCategorySelect = document.getElementById('budget-category-select');
+    const allCategories = getAllCategories();
+    const categorySelect = document.getElementById('expense-category');
+    const budgetCategorySelect = document.getElementById('budget-category-select');
+    const customInputGroup = document.getElementById('custom-category-input-group');
+    
+    // --- Render Expense Category Dropdown ---
+    
+    // Uložíme aktuálne vybranú hodnotu
+    const currentExpenseSelection = categorySelect.value;
+    categorySelect.innerHTML = '';
+    
+    // Pridáme všetky kategórie (vopred definované + vlastné)
+    allCategories.forEach(category => {
+        categorySelect.innerHTML += `<option value="${category}">${category}</option>`;
+    });
 
-categorySelect.innerHTML = '';
-budgetCategorySelect.innerHTML = '';
-expenseCategories.forEach(category => {
-categorySelect.innerHTML += `<option value="${category}">${category}</option>`;
-budgetCategorySelect.innerHTML += `<option value="${category}">${category}</option>`;
-});
+    // Pridáme možnosť pre vlastnú položku na koniec
+    categorySelect.innerHTML += `<option value="${CUSTOM_CATEGORY_OPTION}" class="font-bold border-t">-- Vlastná položka --</option>`;
 
-const initialBudgetCategory = budgetCategorySelect.value;
-document.getElementById('budget-amount-input').value = monthlyBudget[initialBudgetCategory] || '';
+    // Obnovíme predošlú voľbu, ak existuje, inak zvolíme prvú
+    if (currentExpenseSelection && allCategories.includes(currentExpenseSelection)) {
+        categorySelect.value = currentExpenseSelection;
+    } else if (currentExpenseSelection === CUSTOM_CATEGORY_OPTION) {
+         categorySelect.value = CUSTOM_CATEGORY_OPTION;
+    } else if (allCategories.length > 0) {
+        categorySelect.value = allCategories[0];
+    }
+    
+    // Nastavenie viditeľnosti pre vlastnú položku pri spustení
+    if (categorySelect.value === CUSTOM_CATEGORY_OPTION) {
+        customInputGroup.classList.remove('hidden');
+    } else {
+        customInputGroup.classList.add('hidden');
+    }
 
-budgetCategorySelect.addEventListener('change', (e) => {
-const selectedCategory = e.target.value;
-document.getElementById('budget-amount-input').value = monthlyBudget[selectedCategory] || '';
-updateBudgetRuleChart();
-});
+
+    // --- Render Budget Category Dropdown ---
+    // Rozpočet sa nastavuje len na EXISTUJÚCE kategórie (vrátane vlastných)
+    const currentBudgetSelection = budgetCategorySelect.value;
+    budgetCategorySelect.innerHTML = '';
+
+    allCategories.forEach(category => {
+        budgetCategorySelect.innerHTML += `<option value="${category}">${category}</option>`;
+    });
+    
+    if (allCategories.length > 0) {
+        if (currentBudgetSelection && allCategories.includes(currentBudgetSelection)) {
+            budgetCategorySelect.value = currentBudgetSelection;
+        } else {
+            budgetCategorySelect.value = allCategories[0];
+        }
+    } else {
+        // Ak nie sú žiadne výdavky a kategórie, zobraz aspoň predvolené
+        expenseCategories.forEach(category => {
+             budgetCategorySelect.innerHTML += `<option value="${category}">${category}</option>`;
+        });
+         budgetCategorySelect.value = expenseCategories[0];
+    }
+    
+    // Nastavenie hodnoty inputu pre rozpočet
+    const initialBudgetCategory = budgetCategorySelect.value;
+    document.getElementById('budget-amount-input').value = monthlyBudget[initialBudgetCategory] || '';
 }
 
+// Inicializácia listenerov, ktoré závisia len na DOM (nebudú sa meniť pri renderUI)
 document.addEventListener('DOMContentLoaded', () => {
 loadDataFromLocalStorage();
-renderUI();
 
+// Inicializácia a prvé vykreslenie (volá renderUI)
 renderAllUI();
+
+// Event listener pre zmenu v kategórii výdavkov (ukáže/skryje pole pre vlastnú položku)
+document.getElementById('expense-category').addEventListener('change', (e) => {
+    const customInputGroup = document.getElementById('custom-category-input-group');
+    if (e.target.value === CUSTOM_CATEGORY_OPTION) {
+        customInputGroup.classList.remove('hidden');
+    } else {
+        customInputGroup.classList.add('hidden');
+    }
+});
+
+// Event listener pre zmenu v kategórii rozpočtu
+document.getElementById('budget-category-select').addEventListener('change', (e) => {
+    const selectedCategory = e.target.value;
+    document.getElementById('budget-amount-input').value = monthlyBudget[selectedCategory] || '';
+    updateBudgetRuleChart();
+});
+
 
 document.getElementById('add-expense-btn').addEventListener('click', handleAddExpense);
 document.getElementById('save-income-btn').addEventListener('click', handleSaveIncome);
